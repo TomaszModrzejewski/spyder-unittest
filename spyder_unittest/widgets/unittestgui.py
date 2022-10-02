@@ -293,7 +293,7 @@ class UnitTestWidget(PluginMainWidget):
         versions = [_('Versions of frameworks and their installed plugins:')]
         for name, info in all_info.items():
             if not info['available']:
-                versions.append('{}: {}'.format(name, _('not available')))
+                versions.append(f"{name}: {_('not available')}")
             else:
                 version = f'{name} {info["version"]}'
                 plugins = [f'   {name} {version}'
@@ -304,14 +304,10 @@ class UnitTestWidget(PluginMainWidget):
 
     def configure(self):
         """Configure tests."""
-        if self.config:
-            oldconfig = self.config
-        else:
-            oldconfig = Config(wdir=self.default_wdir)
+        oldconfig = self.config or Config(wdir=self.default_wdir)
         frameworks = self.framework_registry.frameworks
         versions = self.get_versions(use_cached=True)
-        config = ask_for_config(frameworks, oldconfig, versions, parent=self)
-        if config:
+        if config := ask_for_config(frameworks, oldconfig, versions, parent=self):
             self.config = config
 
     def config_is_valid(self, config=None):
@@ -359,9 +355,8 @@ class UnitTestWidget(PluginMainWidget):
             configuration for unit tests. If None, use `self.config`.
             In either case, configuration should be valid.
         """
-        if self.pre_test_hook:
-            if self.pre_test_hook() is False:
-                return
+        if self.pre_test_hook and self.pre_test_hook() is False:
+            return
 
         if config is None:
             config = self.config
@@ -496,7 +491,7 @@ class UnitTestWidget(PluginMainWidget):
         ---------
         msg: str
         """
-        self.status_label.setText('<b>{}</b>'.format(msg))
+        self.status_label.setText(f'<b>{msg}</b>')
 
 
 def test():

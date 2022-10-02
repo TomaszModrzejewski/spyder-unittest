@@ -56,8 +56,7 @@ class TestResult:
         self.name = name
         self.message = message
         self.time = time
-        extra_text = extra_text.rstrip()
-        if extra_text:
+        if extra_text := extra_text.rstrip():
             self.extra_text = extra_text.split("\n")
         else:
             self.extra_text = []

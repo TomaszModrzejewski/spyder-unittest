@@ -192,11 +192,8 @@ class UnitTestPlugin(SpyderDockablePlugin):
         project is opened. This function is called whenever this directory may
         change.
         """
-        projects = self.get_plugin(Plugins.Projects)
-        if projects:
-            wdir = projects.get_active_project_path()
-            if not wdir:  # if no project opened
-                wdir = getcwd()
+        if projects := self.get_plugin(Plugins.Projects):
+            wdir = projects.get_active_project_path() or getcwd()
         else:
             wdir = getcwd()
         self.get_widget().default_wdir = wdir
@@ -214,8 +211,7 @@ class UnitTestPlugin(SpyderDockablePlugin):
         config options.
         """
         widget = self.get_widget()
-        projects_plugin = self.get_plugin(Plugins.Projects)
-        if projects_plugin:
+        if projects_plugin := self.get_plugin(Plugins.Projects):
             project = projects_plugin.get_active_project()
         else:
             project = None
@@ -272,8 +268,7 @@ class UnitTestPlugin(SpyderDockablePlugin):
         Note that the line number in the signal is zero based (the first line
         is line 0), but the editor expects a one-based line number.
         """
-        editor_plugin = self.get_plugin(Plugins.Editor)
-        if editor_plugin:
+        if editor_plugin := self.get_plugin(Plugins.Editor):
             editor_plugin.load(filename, lineno + 1, '')
 
     # ----- Public API --------------------------------------------------------

@@ -34,7 +34,7 @@ class ZmqStreamWriter:
         """
         context = zmq.Context()
         self.socket = context.socket(zmq.PAIR)
-        self.socket.connect('tcp://localhost:{}'.format(port))
+        self.socket.connect(f'tcp://localhost:{port}')
 
     def write(self, obj):
         """Write arbitrary Python object to stream."""

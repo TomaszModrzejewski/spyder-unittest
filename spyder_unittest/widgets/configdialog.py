@@ -73,10 +73,7 @@ class ConfigDialog(QDialog):
         self.framework_combobox = QComboBox(self)
         for ix, (name, runner) in enumerate(sorted(frameworks.items())):
             installed = versions[name]['available']
-            if installed:
-                label = name
-            else:
-                label = '{} ({})'.format(name, _('not available'))
+            label = name if installed else f"{name} ({_('not available')})"
             self.framework_combobox.addItem(label)
             self.framework_combobox.model().item(ix).setEnabled(installed)
 
@@ -157,8 +154,7 @@ class ConfigDialog(QDialog):
         if not osp.isdir(basedir):
             basedir = getcwd()
         title = _("Select directory")
-        directory = getexistingdirectory(self, title, basedir)
-        if directory:
+        if directory := getexistingdirectory(self, title, basedir):
             self.wdir_lineedit.setText(directory)
 
     def get_config(self):

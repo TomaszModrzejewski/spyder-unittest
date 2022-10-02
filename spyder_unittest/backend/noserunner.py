@@ -28,9 +28,11 @@ class NoseRunner(RunnerBase):
     def create_argument_list(self, config, cov_path):
         """Create argument list for testing process."""
         return [
-            '-m', self.module, '--with-xunit',
-            '--xunit-file={}'.format(self.resultfilename),
-            ]
+            '-m',
+            self.module,
+            '--with-xunit',
+            f'--xunit-file={self.resultfilename}',
+        ]
 
     def finished(self):
         """Called when the unit test process has finished."""
@@ -60,25 +62,19 @@ class NoseRunner(RunnerBase):
         for testcase in data:
             category = Category.OK
             status = 'ok'
-            name = '{}.{}'.format(testcase.get('classname'),
-                                  testcase.get('name'))
+            name = f"{testcase.get('classname')}.{testcase.get('name')}"
             message = ''
             time = float(testcase.get('time'))
             extras = []
 
             for child in testcase:
                 if child.tag in ('error', 'failure', 'skipped'):
-                    if child.tag == 'skipped':
-                        category = Category.SKIP
-                    else:
-                        category = Category.FAIL
+                    category = Category.SKIP if child.tag == 'skipped' else Category.FAIL
                     status = child.tag
                     type_ = child.get('type')
                     message = child.get('message', default='')
-                    if type_ and message:
-                        message = '{0}: {1}'.format(type_, message)
-                    elif type_:
-                        message = type_
+                    if type_:
+                        message = '{0}: {1}'.format(type_, message) if message else type_
                     if child.text:
                         extras.append(child.text)
                 elif child.tag in ('system-out', 'system-err'):
@@ -87,8 +83,7 @@ class NoseRunner(RunnerBase):
                     else:
                         heading = _('Captured stderr')
                     contents = child.text.rstrip('\n')
-                    extras.append('----- {} -----\n{}'.format(heading,
-                                                              contents))
+                    extras.append(f'----- {heading} -----\n{contents}')
 
             extra_text = '\n\n'.join(extras)
             testresults.append(
