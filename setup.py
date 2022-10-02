@@ -30,9 +30,12 @@ def get_package_data(name, extlist):
     # Workaround to replace os.path.relpath (not available until Python 2.6):
     offset = len(name) + len(os.pathsep)
     for dirpath, _dirnames, filenames in os.walk(name):
-        for fname in filenames:
-            if not fname.startswith('.') and osp.splitext(fname)[1] in extlist:
-                flist.append(osp.join(dirpath, fname)[offset:])
+        flist.extend(
+            osp.join(dirpath, fname)[offset:]
+            for fname in filenames
+            if not fname.startswith('.') and osp.splitext(fname)[1] in extlist
+        )
+
     return flist
 
 

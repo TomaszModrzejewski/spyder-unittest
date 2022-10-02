@@ -95,15 +95,13 @@ class SpyderPlugin():
         if report.when == 'call':
             self.status = report.outcome
             self.duration = report.duration
-        else:
-            if report.outcome == 'failed':
-                self.had_error = True
-            elif report.outcome == 'skipped':
-                self.was_skipped = True
+        elif report.outcome == 'failed':
+            self.had_error = True
+        elif report.outcome == 'skipped':
+            self.was_skipped = True
         if hasattr(report, 'wasxfail'):
             self.was_xfail = True
-            self.longrepr.append(report.wasxfail if report.wasxfail else 
-                'WAS EXPECTED TO FAIL')
+            self.longrepr.append(report.wasxfail or 'WAS EXPECTED TO FAIL')
         self.sections = report.sections  # already accumulated over phases
         if report.longrepr:
             first_msg_idx = len(self.longrepr)
@@ -117,16 +115,14 @@ class SpyderPlugin():
                 self.longrepr.append(str(report.longrepr))
             if report.outcome == 'failed' and report.when in (
                     'setup', 'teardown'):
-                self.longrepr[first_msg_idx] = '{} {}: {}'.format(
-                    'ERROR at', report.when, self.longrepr[first_msg_idx])
+                self.longrepr[
+                    first_msg_idx
+                ] = f'ERROR at {report.when}: {self.longrepr[first_msg_idx]}'
 
     def pytest_runtest_logfinish(self, nodeid, location):
         """Called by pytest when the entire test is completed."""
         if self.was_xfail:
-            if self.status == 'passed':
-                self.status = 'xpassed'
-            else: # 'skipped'
-                self.status = 'xfailed'
+            self.status = 'xpassed' if self.status == 'passed' else 'xfailed'
         elif self.was_skipped:
             self.status = 'skipped'
         data = {'event': 'logreport',

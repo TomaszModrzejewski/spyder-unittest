@@ -144,11 +144,11 @@ def test_run_tests_with_pre_test_hook_returning_false(widget):
                           '0 tests failed, 1 passed, 90% coverage')])
 def test_unittestwidget_process_finished_updates_status_label(widget, results, label):
     widget.process_finished(results, 'output', True)
-    assert widget.status_label.text() == '<b>{}</b>'.format(label)
+    assert widget.status_label.text() == f'<b>{label}</b>'
 
 def test_unittestwidget_process_finished_abnormally_status_label(widget):
     widget.process_finished([], 'output', False)
-    expected_text = '<b>{}</b>'.format('Test process exited abnormally')
+    expected_text = '<b>Test process exited abnormally</b>'
     assert widget.status_label.text() == expected_text
 
 @pytest.mark.parametrize('framework', ['pytest', 'nose'])

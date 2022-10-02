@@ -65,9 +65,8 @@ class Abbreviator:
                 elif len_abbrev == len(other):
                     self.dic[other][0] = other
                     len_abbrev += 1
-                else:
-                    if len(self.dic[other][0]) < len_abbrev:
-                        self.dic[other][0] = other[:len_abbrev]
+                elif len(self.dic[other][0]) < len_abbrev:
+                    self.dic[other][0] = other[:len_abbrev]
         else:
             self.dic[start] = [start[:len_abbrev], Abbreviator()]
         self.dic[start][1].add(rest)
@@ -76,7 +75,7 @@ class Abbreviator:
         """Return abbreviation of name."""
         if '[' in name:
             name, parameters = name.split('[', 1)
-            parameters = '[' + parameters
+            parameters = f'[{parameters}'
         else:
             parameters = ''
         if '.' in name:

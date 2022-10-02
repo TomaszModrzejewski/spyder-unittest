@@ -57,10 +57,10 @@ def test_runnerbase_prepare_process(monkeypatch, pythonpath, env_pythonpath):
     mock_process.finished.connect.assert_called_once_with(runner.finished)
     if pythonpath:
         if env_pythonpath:
-            mock_environment.insert.assert_any_call('PYTHONPATH',
-                                                    'pythonpath{}{}'.format(
-                                                        os.pathsep,
-                                                        env_pythonpath))
+            mock_environment.insert.assert_any_call(
+                'PYTHONPATH', f'pythonpath{os.pathsep}{env_pythonpath}'
+            )
+
         else:
             mock_environment.insert.assert_any_call('PYTHONPATH', 'pythonpath')
         mock_process.setProcessEnvironment.assert_called_once()

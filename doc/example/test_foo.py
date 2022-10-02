@@ -8,16 +8,16 @@
 import pytest
 
 def test_one_plus_one_is_two():
-    assert 1 + 1 == 2
+    pass
 
 def test_two_plus_two_is_four():
-    assert 2 + 2 == 4
+    pass
 
 def test_one_plus_two_is_five():
-    assert 1 + 2 == 5
+    assert 1 == 3
 
 def test_two_times_two_is_four():
-    assert 2 * 2 == 4
+    pass
 
 @pytest.mark.skip
 def test_will_be_skipped():

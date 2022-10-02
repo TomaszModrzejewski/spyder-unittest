@@ -288,9 +288,8 @@ class TestDataModel(QAbstractItemModel):
             return QModelIndex()
         if not parent.isValid():
             return self.createIndex(row, column, TOPLEVEL_ID)
-        else:
-            testresult_index = parent.row()
-            return self.createIndex(row, column, testresult_index)
+        testresult_index = parent.row()
+        return self.createIndex(row, column, testresult_index)
 
     def data(self, index, role):
         """
@@ -356,10 +355,7 @@ class TestDataModel(QAbstractItemModel):
         if not index.isValid():
             return QModelIndex()
         id = index.internalId()
-        if id == TOPLEVEL_ID:
-            return QModelIndex()
-        else:
-            return self.index(id, 0)
+        return QModelIndex() if id == TOPLEVEL_ID else self.index(id, 0)
 
     def rowCount(self, parent=QModelIndex()):
         """Return number of rows underneath `parent`."""
@@ -371,10 +367,7 @@ class TestDataModel(QAbstractItemModel):
 
     def columnCount(self, parent=QModelIndex()):
         """Return number of rcolumns underneath `parent`."""
-        if not parent.isValid():
-            return len(HEADERS)
-        else:
-            return 1
+        return 1 if parent.isValid() else len(HEADERS)
 
     def sort(self, column, order):
         """Sort model by `column` in `order`."""

@@ -49,16 +49,15 @@ class UnittestRunner(RunnerBase):
 
         try:
             while lines[line_index]:
-                data = self.try_parse_result(lines, line_index)
-                if data:
+                if data := self.try_parse_result(lines, line_index):
                     line_index = data[0]
                     if data[3] == 'ok':
                         cat = Category.OK
-                    elif data[3] == 'FAIL' or data[3] == 'ERROR':
+                    elif data[3] in ['FAIL', 'ERROR']:
                         cat = Category.FAIL
                     else:
                         cat = Category.SKIP
-                    name = '{}.{}'.format(data[2], data[1])
+                    name = f'{data[2]}.{data[1]}'
                     tr = TestResult(category=cat, status=data[3], name=name,
                                     message=data[4])
                     res.append(tr)
@@ -68,12 +67,14 @@ class UnittestRunner(RunnerBase):
             line_index += 1
             while not (lines[line_index]
                        and all(c == '-' for c in lines[line_index])):
-                data = self.try_parse_exception_block(lines, line_index)
-                if data:
+                if data := self.try_parse_exception_block(lines, line_index):
                     line_index = data[0]
                     test_index = next(
-                        i for i, tr in enumerate(res)
-                        if tr.name == '{}.{}'.format(data[2], data[1]))
+                        i
+                        for i, tr in enumerate(res)
+                        if tr.name == f'{data[2]}.{data[1]}'
+                    )
+
                     res[test_index].extra_text = data[3]
                 else:
                     line_index += 1
@@ -96,19 +97,16 @@ class UnittestRunner(RunnerBase):
             Otherwise, return None.
         """
         regexp = r'([^\d\W]\w*) \(([^\d\W][\w.]*)\)'
-        match = re.match(regexp, lines[line_index])
-        if match:
-            function_name = match.group(1)
-            class_name = match.group(2)
-        else:
+        if not (match := re.match(regexp, lines[line_index])):
             return None
+        function_name = match[1]
+        class_name = match[2]
+        regexp = (r' \.\.\. (ok|FAIL|ERROR|skipped|expected failure|'
+                  r"unexpected success)( '([^']*)')?\Z")
         while lines[line_index]:
-            regexp = (r' \.\.\. (ok|FAIL|ERROR|skipped|expected failure|'
-                      r"unexpected success)( '([^']*)')?\Z")
-            match = re.search(regexp, lines[line_index])
-            if match:
-                result = match.group(1)
-                msg = match.group(3) or ''
+            if match := re.search(regexp, lines[line_index]):
+                result = match[1]
+                msg = match[3] or ''
                 return (line_index + 1, function_name, class_name, result, msg)
             line_index += 1
         return None
@@ -125,14 +123,14 @@ class UnittestRunner(RunnerBase):
             the test function, the name of the test class, and the text of the
             exception. Otherwise, return None.
         """
-        if not all(char == '=' for char in lines[line_index]):
+        if any(char != '=' for char in lines[line_index]):
             return None
         regexp = r'\w+: ([^\d\W]\w*) \(([^\d\W][\w.]*)\)\Z'
         match = re.match(regexp, lines[line_index + 1])
         if not match:
             return None
         line_index += 1
-        while not all(char == '-' for char in lines[line_index]):
+        while any(char != '-' for char in lines[line_index]):
             if not lines[line_index]:
                 return None
             line_index += 1
@@ -141,4 +139,4 @@ class UnittestRunner(RunnerBase):
         while lines[line_index]:
             exception_text.append(lines[line_index])
             line_index += 1
-        return (line_index, match.group(1), match.group(2), exception_text)
+        return line_index, match[1], match[2], exception_text
